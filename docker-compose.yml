@@ -1,0 +1,10 @@
+version: "3"
+services:
+  next-app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      - NEXT_PUBLIC_ANALYTICS_USER=Ashutosh
