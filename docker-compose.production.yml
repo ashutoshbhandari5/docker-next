@@ -3,10 +3,8 @@ services:
   next-app:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     ports:
       - "3000:3000"
     volumes:
       - .:/app
-    environment:
-      - NEXT_PUBLIC_ANALYTICS_USER=Ashutosh
