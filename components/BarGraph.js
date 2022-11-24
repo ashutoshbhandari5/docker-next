@@ -1,7 +1,6 @@
 import React from "react";
 import { Bar } from "@visx/shape";
 import { Group } from "@visx/group";
-import { GradientTealBlue } from "@visx/gradient";
 import * as d3 from "d3";
 
 const BarGraph = ({ data, width, height }) => {
