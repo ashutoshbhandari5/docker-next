@@ -3,9 +3,10 @@ import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { AxisLeft, AxisBottom } from "@visx/axis";
 import { Line, LinePath } from "@visx/shape";
-import { extent } from "d3-array";
+import { extent, bisector } from "d3-array";
 import { LinearGradient } from "@visx/gradient";
 import { GridRows, GridColumns } from "@visx/grid";
+import { localPoint } from "@visx/event";
 import { useTooltip, TooltipWithBounds, defaultStyles } from "@visx/tooltip";
 import { GlyphCircle } from "@visx/glyph";
 import { data } from "../utils/data";
@@ -14,7 +15,13 @@ function LineChart() {
   const height = 700;
   const width = 900;
 
-  const { tooltipData, tooltipLeft = 0, tooltipTop = 0 } = useTooltip();
+  const {
+    tooltipData,
+    tooltipLeft = 0,
+    tooltipTop = 0,
+    showTooltip,
+    hideTooltip,
+  } = useTooltip();
 
   const margin = { top: 40, right: 40, bottom: 40, left: 40 };
 
@@ -52,6 +59,38 @@ function LineChart() {
     minWidth: 60,
     backgroundColor: "rgba(0,0,0,0.9)",
     color: "white",
+  };
+
+  const bisectDate = bisector((d) => d.year).left;
+
+  const getD = (year) => {
+    const output = data.filter(function (el) {
+      return el.year === year;
+    });
+    return output;
+  };
+
+  const handleTooltip = (event) => {
+    const { x } = localPoint(event) || { x: 0 };
+    const x0 = timeScale.invert(x - margin.left); // get Date from the scale
+
+    const index = bisectDate(data, x0, 1);
+    const d0 = data[index - 1];
+    const d1 = data[index];
+    let d = d0;
+
+    if (d1 && getDate(d1)) {
+      d =
+        x0.valueOf() - getDate(d0).valueOf() >
+        getDate(d1).valueOf() - x0.valueOf()
+          ? d1
+          : d0;
+    }
+    showTooltip({
+      tooltipData: getD(d.year),
+      tooltipLeft: x,
+      tooltipTop: rdScale(getRD(d)),
+    });
   };
 
   return (
@@ -154,6 +193,17 @@ function LineChart() {
                 />
               </g>
             ))}
+          <rect
+            x={0}
+            y={0}
+            width={width}
+            height={height}
+            onTouchStart={handleTooltip}
+            fill={"transparent"}
+            onTouchMove={handleTooltip}
+            onMouseMove={handleTooltip}
+            onMouseLeave={() => hideTooltip()}
+          />
         </Group>
       </svg>
       {/* render a tooltip */}
