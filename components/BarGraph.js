@@ -8,8 +8,9 @@ import { scaleBand, scaleLinear } from "@visx/scale";
 const BarGraph = ({ data, width, height }) => {
   const barData = data.slice(5);
   const verticalMargin = 120;
+  const marginLeft = 30;
 
-  const xMax = width;
+  const xMax = width - marginLeft;
   const yMax = height - verticalMargin;
 
   const xScale = useMemo(
@@ -18,7 +19,7 @@ const BarGraph = ({ data, width, height }) => {
         .scaleBand()
         .range([0, xMax])
         .domain(barData.map((el) => el.letter))
-        .padding(0.4),
+        .padding(0.3),
     [xMax, barData]
   );
 
@@ -41,7 +42,7 @@ const BarGraph = ({ data, width, height }) => {
         fill={d3.color("steelblue")}
         rx={14}
       />
-      <Group top={verticalMargin / 2} left={30}>
+      <Group top={verticalMargin / 2} left={marginLeft}>
         {barData.map((el, i) => {
           const letter = el.letter;
           const barWidth = xScale.bandwidth();
